@@ -77,7 +77,7 @@ int CountWords(string_view str) {
         str.begin(), 0, // начальное значение
         plus<>{}, // группирующая функция
         [](char rh, char lh) {
-            return (rh == ' ') && (lh != ' ');
+            return (rh != ' ') && (lh == ' ');
         });
 
     if (str[0] != ' ') {
