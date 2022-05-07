@@ -72,7 +72,7 @@ int CountWords(string_view str) {
         return 0;
     }
 
-    int space_count = transform_reduce(
+    int space_count = transform_reduce(execution::par,
         next(str.begin()), str.end(), // диапазон
         str.begin(), 0, // начальное значение
         plus<>{}, // группирующая функция
