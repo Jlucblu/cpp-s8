@@ -34,7 +34,7 @@ void MergeSort(RandomIt range_begin, RandomIt range_end, int level = 0) {
 
     // 3. Разбиваем вектор на две равные части
     auto mid = elements.begin() + range_length / 2;
-    // 4. Вызываем функцию MergeSort от каждой половины вектора // авторское решение
+    // 4. Вызываем функцию MergeSort от каждой половины вектора
     if (level <= 2) {
         auto left_future = async([&]
             {
@@ -87,7 +87,7 @@ void TestMergeSort() {
     {
         mt19937 generator;
 
-        vector<int> test_vector(10000);
+        vector<int> test_vector(100);
 
         // iota             -> http://ru.cppreference.com/w/cpp/algorithm/iota
         // Заполняет диапазон последовательно возрастающими значениями
@@ -113,7 +113,7 @@ void TestMergeSort() {
     {
         mt19937 generator;
 
-        vector<int> test_vector(10000);
+        vector<int> test_vector(100);
 
         // iota             -> http://ru.cppreference.com/w/cpp/algorithm/iota
         // Заполняет диапазон последовательно возрастающими значениями
