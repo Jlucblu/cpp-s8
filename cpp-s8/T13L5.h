@@ -47,26 +47,41 @@ void Test(string_view mark, Container keys, Function function) {
 #define TEST(function) Test(#function, keys, function<remove_const_t<decltype(keys)>, Reverser>)
 
 //Авторское решение
+template <typename ExecutionPolicy, typename ForwardRange, typename Function>
+void ForEach(const ExecutionPolicy& policy, ForwardRange& range, Function function) {
+    if constexpr (
+        is_same_v<ExecutionPolicy, execution::sequenced_policy>
+        || is_same_v<typename iterator_traits<typename ForwardRange::iterator>::iterator_category,
+        random_access_iterator_tag>
+        ) {
+        for_each(policy, range.begin(), range.end(), function);
+
+    }
+    else {
+        static constexpr int PART_COUNT = 4;
+        const auto part_length = size(range) / PART_COUNT;
+        auto part_begin = range.begin();
+        auto part_end = next(part_begin, part_length);
+
+        vector<future<void>> futures;
+        for (int i = 0;
+            i < PART_COUNT;
+            ++i,
+            part_begin = part_end,
+            part_end = (i == PART_COUNT - 1
+                ? range.end()
+                : next(part_begin, part_length))
+            ) {
+            futures.push_back(async([function, part_begin, part_end] {
+                for_each(part_begin, part_end, function);
+                }));
+        }
+    }
+}
+
 template <typename ForwardRange, typename Function>
 void ForEach(ForwardRange& range, Function function) {
-    static constexpr int PART_COUNT = 4;
-    const auto part_length = range.size() / PART_COUNT;
-    auto part_begin = range.begin();
-    auto part_end = next(part_begin, part_length);
-
-    vector<future<void>> futures;
-    for (int i = 0;
-        i < PART_COUNT;
-        ++i,
-        part_begin = part_end,
-        part_end = (i == PART_COUNT - 1
-            ? range.end()
-            : next(part_begin, part_length))
-        ) {
-        futures.push_back(async([function, part_begin, part_end] {
-            for_each(part_begin, part_end, function);
-            }));
-    }
+    ForEach(execution::seq, range, function);
 }
 
 void TestForEach() {
